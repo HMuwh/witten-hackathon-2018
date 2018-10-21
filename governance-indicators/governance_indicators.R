@@ -8,12 +8,12 @@ library(RColorBrewer)
 library(plotly)
 
 
-raw <- read_csv("/Users/HM/Dropbox/DropDok/Uni/18:19WS/Data Science/Projekt Data/WGI_csv/WGIData.csv")
+raw <- read_csv("WGIData.csv")
 
-raw_gdp <- read_csv("/Users/HM/Dropbox/DropDok/Uni/18:19WS/Data Science/Projekt Data/API_NY.GDP.MKTP.CD_DS2_en_csv_v2_10181085/API_NY.GDP.MKTP.CD_DS2_en_csv_v2_10181085.csv",
+raw_gdp <- read_csv("API_NY.GDP.MKTP.CD_DS2_en_csv_v2_10181085.csv",
                     skip = 4)
 
-raw_lit <- read_csv("/Users/HM/Dropbox/DropDok/Uni/18:19WS/Data Science/Projekt Data/API_SE.ADT.LITR.ZS_DS2_en_csv_v2_10181228/API_SE.ADT.LITR.ZS_DS2_en_csv_v2_10181228.csv",
+raw_lit <- read_csv("API_SE.ADT.LITR.ZS_DS2_en_csv_v2_10181228.csv",
                     skip = 4)
 
 # Create Working Spreadsheets
