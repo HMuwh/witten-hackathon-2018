@@ -1,6 +1,12 @@
 library(tidyverse)
 library(mapproj)
 library(maps)
+library(ggplot2)
+library(readr)
+library(rworldmap)
+library(RColorBrewer)
+library(plotly)
+
 
 raw <- read_csv("/Users/HM/Dropbox/DropDok/Uni/18:19WS/Data Science/Projekt Data/WGI_csv/WGIData.csv")
 
@@ -58,36 +64,80 @@ joined_2 <- left_join(joined_1, tidy_lit, by = c("country_code", "year")) %>%
 
 # Country Corruption Chart
 
+#control_of_corruption und country_code sind Variable (Auch in ggtitle!)!
 joined_2 %>%
   filter(country_code == "ITA") %>% 
   ggplot() +
     aes(date, control_of_corruption) + 
     geom_line() +
+    ggtitle("Control of Corruption in Italy") +
     xlab("Year") +
-    ylab("Impact of Corruption") +
-    ylim(-2.5,2.5)
+    ylab("Control of Corruption") +
+    ylim(-3.5,2.5) +
+    theme_minimal()
 
 # Barplot mit 3 Ländern im Vergleich
+
+# 3 Länder und Date sind Varable (auch in ggtitle!)
 joined_2 %>%
-  filter(country_code %in% c("DEU", "ITA", "AFG"), date == "2014-01-01") %>%
+  filter(country_code %in% c("DEU", "ITA", "DNK"), date == "2014-01-01") %>%
   ggplot() +
   aes(country_code, control_of_corruption, fill = control_of_corruption) +
   geom_bar(stat = "identity") +
+  ggtitle("Comparison of Control of Corruption in 2014") +
   coord_flip() +
-  ylim(-2.5,2.5) +
-  scale_fill_gradient(low = "red", high = "green")
+  #ylim(-3.5,3.5) +
+  scale_y_continuous(limits = c(-3.5, 3.5)) +
+  #scale_y_continuous(breaks = c(-3.5, -2, 0, 2, 3.5)) +
+  # guides --> delete legend
+  guides(fill = FALSE) +
+  #Achsenbeschriftung entfernen
+  xlab(NULL) +
+  ylab(NULL) +
+  scale_fill_gradient(low = "darkred", high = "green") +
+  theme_minimal()
 
-# Versuch Spiderweb Plot    
-joined_2 %>%
-  filter(country_code == "AFG", date == 2014-01-01) %>%
-  ggplot() +
-    aes(control_of_corruption, government_effectiveness, political_stability, regulatory_quality, rule_of_law, voice_accountability) +
-    geom_polygon()
+
+# Spiderweb Plot
+# year und country_code sind Variable!
+
+spi <- joined_2 %>%
+  filter(year == 2016, country_code == "DEU")
+plot_ly(
+    type = 'scatterpolar',
+    r = c(spi$control_of_corruption, spi$government_effectiveness, spi$political_stability, spi$rule_of_law, spi$regulatory_quality, spi$voice_accountability),
+    theta = c('Control of Corruption','Government Effectiveness','Political Stability', 'Rule of Law', 'Regulatory Quality', 'Voice and Accountability'),
+    fill = 'toself'
+    ) %>%
+  layout(
+    polar = list(
+      radialaxis = list(
+        visible = T,
+        range = c(-3.5,2.5)
+        ) 
+    ),
+    showlegend = F
+  )
+
+
 
 
 #Map Plot
-joined_2 %>%
-  ggplot() +
-    aes(control_of_corruption) +
-    π + coord_map()
+# year und control_of_corruption sind Variable!
+
+map_joined(joined_2)
+sPDF <- joined_2 %>%
+  filter(year == 2009) %>%
+  joinCountryData2Map(
+    joinCode = "ISO3",
+    nameJoinColumn = "country_code") %>%
+  mapCountryData( 
+               nameColumnToPlot = "control_of_corruption",
+               # Je nach gewählter Variable!
+               mapTitle = "Control of Corruption",
+               catMethod = "diverging",
+               numCats = 5,
+               colourPalette = c("darkred", "red", "yellow", "chartreuse", "chartreuse4"),
+               oceanCol = "aliceblue",
+               missingCountryCol = "white")
 
